@@ -1,0 +1,15 @@
+
+h1. Título Principal
+
+Este es un párrafo con *texto en negrita* y _texto en cursiva_.
+
+h2. Subtítulo
+
+- Elemento de lista
+- Otro elemento de lista
+
+{code:sql}
+SELECT * FROM usuarios;
+{code}
+
+Sr. Data Software Engineer at TCS | Former Engineer at AWS | 

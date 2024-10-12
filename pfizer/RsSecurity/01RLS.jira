@@ -1,0 +1,69 @@
+h2. Reviewing Redshift RLS for Organizational Restrictions
+
+Row-Level Security (RLS) allows for granular control over sensitive data by defining policies that restrict access to specific rows in tables. This can work alongside column-level security.
+
+h3. Benefits
+* Limit access to sensitive data based on user roles.
+* No need to modify queries with additional conditions.
+
+h3. Things to Consider
+* Keep policies simple to avoid performance issues.
+* Joins in policies can impact performance.
+* Users can only update/delete rows they can see.
+* RLS is not applied for INSERT, COPY, and ALTER TABLE APPEND statements.
+
+h3. How it Works
+* Policies are defined using SQL expressions.
+* Policies are attached to users, roles, or tables.
+* RLS applies to SELECT, UPDATE, and DELETE statements.
+* Multiple policies can be combined with AND or OR logic.
+
+h3. Management
+* Superusers, security admins, or users with `sys:secadmin` can manage policies.
+* Use `ALTER TABLE` to turn RLS on/off for tables.
+* Specific statements are used to create, alter, attach/detach, and drop policies.
+* System views exist to monitor and troubleshoot RLS.
+
+See CREATE POLICY and ATTACH RLS POLICY statements
+
+{code:sql}
+CREATE RLS POLICY policy_name
+    [ WITH (column_name data_type [, ...]) [ [AS] relation_alias ] ]
+    USING ( using_predicate_exp )
+
+ATTACH RLS POLICY policy_name ON [TABLE] table_name [, ...]
+    TO { user_name | ROLE role_name | PUBLIC } [, ...]
+{code}
+
+Usage of CREATE RLS POLICY: 
+
+* Amazon Redshift supports filters that can be part of a WHERE clause in a query.
+* All policies attached to a table must use the same table alias.
+* No need for SELECT permission on lookup tables; Redshift grants it automatically for the policy.
+* Unsupported object types inside a policy definition include:
+  * Catalog tables
+  * Cross-database relations
+  * External tables
+  * Regular views
+  * Late-binding views
+  * Tables with RLS policies already enabled
+  * Temporary tables
+
+Usage of ATTACH RLS POLICY: 
+
+* The table being attached must have all columns listed in the WITH clause of the policy.
+* RLS policies can't be attached to the following objects:
+  * Catalog tables
+  * Cross-database relations
+  * External tables
+  * Temporary tables
+  * Lookup tables
+* You can't attach RLS policies to superusers or users with `sys:secadmin` permission.
+
+
+h3. Special Permissions
+* `IGNORE RLS` allows users to query tables with policies without seeing them.
+* `EXPLAIN RLS` allows users to view RLS policy filters in query explanations.
+
+h3. Further Information
+[https://docs.aws.amazon.com/redshift/latest/dg/t_rls_usage.html|AWS RLS Documentation]
